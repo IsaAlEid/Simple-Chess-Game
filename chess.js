@@ -136,13 +136,14 @@ function dragDrop(e) {
   const taken = e.target.classList.contains('piece')
   const opponentPiece = playerTurn === 'white' ? 'black' : 'white'
   // console.log('opponentPiece', opponentPiece);
-  const takenByOpponent = e.target.firstChild.classList.contains(opponentPiece)
+  const takenByOpponent = e.target.firstChild?.classList.contains(opponentPiece)
 
   if (correctTurn) {
     const valid = checkIfValidMove(e.target)
     if (takenByOpponent && valid) {
       e.target.parentNode.appendChild(draggedPiece)
       e.target.remove()
+      checkForWin()
       changePlayer()
       return
     }

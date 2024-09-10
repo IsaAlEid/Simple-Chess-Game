@@ -34,15 +34,7 @@ p {
   font-size: larger;
   font-weight: bold;
 }
-.header {
-  align-items: center;
-  justify-content: center;
-  margin: 50px;
-  font-weight: bolder;
-  font-size: 2rem;
-  color: white;
-  border: 5px solid black;
-}
+
 .square svg {
   width: 30px;
   height: 30px;
@@ -91,6 +83,11 @@ h1 {
   font-weight: bold;
 }
 p {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+a {
   color: white;
   font-size: 1.5rem;
   font-weight: bold;

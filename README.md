@@ -27,7 +27,11 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
   * Move your pieces in the best possible strategy in order to checkmate your opponent.
 
 - Requirements 
+<<<<<<< HEAD
   * All that's required is a web browser capable of running HTML and JavaScript.
+=======
+  * All that's required is a web browser capable of running HTMl and JavaScript.
+>>>>>>> 5d76417bc3526cc749f35fbb0149733be4b46e40
 
 - Installation
  
