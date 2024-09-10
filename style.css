@@ -1,29 +1,97 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 20px;
+  flex-direction: column;
+  background: url(chess.jpg);
+  background-size: fill;
+}
 #gameboard {
   width: 320px;
   height: 320px;
   display: flex;
   flex-wrap: wrap;
 }
+#reset-btn {
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background-color: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+p {
+  font-size: larger;
+  font-weight: bold;
+}
 .header {
   align-items: center;
   justify-content: center;
   margin: 50px;
-  font-weight: bold;
+  font-weight: bolder;
+  font-size: 2rem;
+  color: white;
+  border: 5px solid black;
 }
 .square svg {
   width: 30px;
   height: 30px;
   margin: 10px;
+  position: relative;
+  z-index: -10;
 }
 .square {
   width: 40px;
   height: 40px;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .dark {
-  background-color: rgb(87, 77, 77);
+  background-color: rgb(75, 70, 70);
 }
 
 .light {
-  background-color: rgb(65, 27, 27);
+  background-color: rgb(147, 141, 141);
+}
+
+.black {
+  fill: rgb(40, 40, 40);
+}
+
+.white {
+  fill: rgb(255, 255, 255);
+}
+
+.piece {
+  position: relative;
+  z-index: 10;
+}
+path {
+  position: relative;
+  z-index: -11;
+}
+
+h1 {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+}
+p {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
