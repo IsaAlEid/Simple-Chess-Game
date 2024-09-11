@@ -1,5 +1,7 @@
 # Simple-Chess-Game
 
+![Simple Chess](https://i.imgur.com/RvG0bMo.png)
+
 ## **_Description_**
 
 This is a basic/simple chess game that will allow two players (player vs CPU)  to play against each other.
@@ -12,8 +14,6 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
 #### [Instagram](https://www.instagram.com/isa_aleid/?hl=en)|[Github](https://github.com/IsaAlEid)|[Linkedin](https://www.linkedin.com/in/isa-al-eid-478bb130a/)
 
 ---
-
-
 
 ### **_How to play_**
 
@@ -42,13 +42,14 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
 
  ### Image Header
 
-- Making the GameBoard
 
-![Initial code](https://imgur.com/khij4SX)
+- Making the GameBoar
 
-![Draft](https://imgur.com/8eUDsAP)
+![Initial code](https://i.imgur.com/khij4SX.png)
 
-![Finished Board](https://imgur.com/l1q8xp8)
+![Draft](https://i.imgur.com/8eUDsAP.png)
+
+![Finished Board](https://i.imgur.com/l1q8xp8.png)
 
 ---
 
