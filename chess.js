@@ -3,6 +3,7 @@ const playerDisplay = document.querySelector('#player')
 const infoDisplay = document.querySelector('#info-display')
 const err = document.querySelector('#error')
 const width = 8
+// const resetButton = document.getElementById('reset')
 
 let playerTurn = 'white'
 playerDisplay.textContent = 'white'
@@ -74,6 +75,13 @@ const chessPieces = [
   rook
 ]
 
+// resetButton.addEventListener('click', resetGame)
+
+// function resetGame() {
+//   resetGameBoard
+//   resetGame()
+// }
+
 function createBoard() {
   chessPieces.forEach((chessPieces, index) => {
     const square = document.createElement('div')
@@ -90,12 +98,9 @@ function createBoard() {
       square.classList.add(index % 2 === 0 ? 'dark' : 'light')
     }
 
-    // gameBoard.append(square)
+    gameBoard.append(square)
 
     if (index <= 15) {
-      // console.log('square', square)
-      // console.log('square', square.firstChild)
-      // console.log('square', square.firstChild.firstChild.classList)
       square.firstChild.firstChild.classList.add('black')
     }
 
@@ -113,33 +118,31 @@ const allSquares = document.querySelectorAll('#gameboard .square')
 allSquares.forEach((square) => {
   square.addEventListener('dragstart', dragstart)
   square.addEventListener('dragover', dragover)
-  square.addEventListener('drop', dragdrop)
+  square.addEventListener('drop', dragDrop)
 })
 
-let startPositionID
+let startPositionId
 let draggedPiece
 
-function dragStart(e) {
-  startPositionID = number()(e.target.getAttribute('square-id'))
-  draggedPiece = e.target
+function dragstart(e) {
+  startPositionId = e.target.parentNode.getAttribute('square-id')
+  draggedElement = e.target
 }
 
-function dragOver(e) {
+function dragover(e) {
   e.preventDefault()
 }
 
 function dragDrop(e) {
   e.stopPropagation()
-
   const correctTurn = draggedPiece.firstChild.classList.contains(playerTurn)
   const taken = e.target.classList.contains('piece')
+  const valid = checkIfValidMove(e.target)
   const opponentPiece = playerTurn === 'white' ? 'black' : 'white'
 
   const takenByOpponent = e.target.firstChild?.classList.contains(opponentPiece)
 
   if (correctTurn) {
-    const valid = checkIfValidMove(e.target)
-
     if (takenByOpponent && valid) {
       e.target.parentNode.appendChild(draggedPiece)
       e.target.remove()
@@ -149,34 +152,26 @@ function dragDrop(e) {
     }
   }
   if (taken && !takenByOpponent) {
-    infoDisplay.textContent = 'Invalid move'
+    err.textContent = 'Invalid move'
     setTimeout(() => (infoDisplay.textContent = ''), 3000)
     return
   }
+  if (valid) {
+    console.log(valid, 'is this valid')
+
+    e.target.appendChild(draggedPiece)
+    checkForWin()
+    changePlayer()
+  }
 }
 
-if (taken && !takenByOpponent) {
-  err.textContent = 'Invalid move'
-  setTimeout(() => (infoDisplay.textContent = ''), 3000)
-}
-// if (correctTurn)
-if (takenByOpponent && valid) {
-  e.target.parentNode.appendChild(draggedPiece)
-  e.target.remove()
-  checkForWin()
-  changePlayer()
-}
-
-if (valid) {
-  e.target.appendChild(draggedPiece)
-  checkForWin()
-  changePlayer()
-}
 function checkIfValid(target) {
-  const targetId =
-    number(target.parentNode.getAttribute('square-id')) ||
-    number(target.parentNode.getAttribute('square-id'))
-  const piece = draggedPiece.id
+  const targetId = Number(target.parentNode.getAttribute('square-id'))
+  const piece = draggedPiece
+  const startId = Number(startPositionId)
+
+  console.log(startPositionId, targetId, piece)
+
   console.log(startPositionId, targetId, pieceId)
 }
 
@@ -206,4 +201,819 @@ function checkIfValidMove() {
     number()(target.getAttribute('startPositionID'))
   const piece = clickedPiece.firstChild.firstChild
   const target = allSquares[targetId]
+  console.log(startId, targetId, pieceId)
+
+  switch (piece) {
+    case 'pawn':
+      const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
+      if (
+        (starterRow.includes(startId) && startId + width * 2 === targetId) ||
+        startId + width === targetId ||
+        (startId + width - 1 === targetId &&
+          document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild) ||
+        (startId + width + 1 === targetId &&
+          document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild)
+      ) {
+        return true
+      }
+      break
+    case 'knight':
+      if (
+        startId + width * 2 + 1 === targetId ||
+        startId + width * 2 - 1 === targetId ||
+        startId + width - 2 === targetId ||
+        startId + width + 2 === targetId ||
+        startId - width * 2 + 1 === targetId ||
+        startId - width * 2 - 1 === targetId ||
+        startId - width + 2 === targetId ||
+        startId - width - 2 === targetId
+      ) {
+        return true
+      }
+      break
+
+    case 'bishop':
+      if (
+        startId + width + 1 === targetId ||
+        (startId + width * 2 + 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild) ||
+        (startId + width * 3 + 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 + 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 + 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 + 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 + 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 + 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 + 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 + 6}"]`)
+            .firstChild) ||
+        startId + width - 1 === targetId ||
+        (startId + width * 2 - 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild) ||
+        (startId + width * 3 - 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 - 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 - 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 - 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 - 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 - 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 - 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 - 6}"]`)
+            .firstChild) ||
+        startId - width - 1 === targetId ||
+        (startId - width * 2 - 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild) ||
+        (startId - width * 3 - 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 - 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 - 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 - 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 - 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 - 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 - 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 - 6}"]`)
+            .firstChild) ||
+        startId - width + 1 === targetId ||
+        (startId - width * 2 + 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild) ||
+        (startId - width * 3 + 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 + 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 + 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 + 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 + 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 + 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 + 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 + 6}"]`)
+            .firstChild)
+      ) {
+        return true
+      }
+      break
+
+    case 'rook':
+      if (
+        startId + width === targetId ||
+        (startId + width * 2 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild) ||
+        (startId + width * 3 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 6}"]`)
+            .firstChild) ||
+        startId - width === targetId ||
+        (startId - width * 2 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild) ||
+        (startId - width * 3 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 6}"]`)
+            .firstChild) ||
+        startId + 1 === targetId ||
+        (startId + 2 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild) ||
+        (startId + 3 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild) ||
+        (startId + 4 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild) ||
+        (startId + 5 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild) ||
+        (startId + 6 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 5}"]`).firstChild) ||
+        (startId + 7 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 5}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 6}"]`).firstChild) ||
+        startId - 1 === targetId ||
+        (startId - 2 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild) ||
+        (startId - 3 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild) ||
+        (startId - 4 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild) ||
+        (startId - 5 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild) ||
+        (startId - 6 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 5}"]`).firstChild) ||
+        (startId - 7 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 5}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 6}"]`).firstChild)
+      ) {
+        return true
+      }
+      break
+
+    case 'queen':
+      if (
+        startId + width + 1 === targetId ||
+        (startId + width * 2 + 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild) ||
+        (startId + width * 3 + 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 + 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 + 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 + 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 + 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 + 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 + 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 + 6}"]`)
+            .firstChild) ||
+        startId + width - 1 === targetId ||
+        (startId + width * 2 - 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild) ||
+        (startId + width * 3 - 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 - 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 - 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 - 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 - 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 - 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId + width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 5 - 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 - 6}"]`)
+            .firstChild) ||
+        startId - width - 1 === targetId ||
+        (startId - width * 2 - 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild) ||
+        (startId - width * 3 - 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 - 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 - 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 - 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 - 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 - 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width - 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 - 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 - 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 - 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 - 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 - 6}"]`)
+            .firstChild) ||
+        startId - width + 1 === targetId ||
+        (startId - width * 2 + 2 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild) ||
+        (startId - width * 3 + 3 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 + 4 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 + 5 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 + 6 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 + 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 + 7 === targetId &&
+          !document.querySelector(`[square-id = "${startId - width + 1}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 2 + 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 3 + 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 4 + 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId - width * 5 + 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id = "${startId + width * 6 + 6}"]`)
+            .firstChild) ||
+        startId + width === targetId ||
+        (startId + width * 2 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild) ||
+        (startId + width * 3 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild) ||
+        (startId + width * 4 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild) ||
+        (startId + width * 5 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild) ||
+        (startId + width * 6 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 5}"]`)
+            .firstChild) ||
+        (startId + width * 7 === targetId &&
+          !document.querySelector(`[square-id="${startId + width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId + width * 6}"]`)
+            .firstChild) ||
+        startId - width === targetId ||
+        (startId - width * 2 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild) ||
+        (startId - width * 3 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild) ||
+        (startId - width * 4 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild) ||
+        (startId - width * 5 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild) ||
+        (startId - width * 6 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 5}"]`)
+            .firstChild) ||
+        (startId - width * 7 === targetId &&
+          !document.querySelector(`[square-id="${startId - width}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 2}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 3}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 4}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 5}"]`)
+            .firstChild &&
+          !document.querySelector(`[square-id="${startId - width * 6}"]`)
+            .firstChild) ||
+        startId + 1 === targetId ||
+        (startId + 2 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild) ||
+        (startId + 3 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild) ||
+        (startId + 4 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild) ||
+        (startId + 5 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild) ||
+        (startId + 6 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 5}"]`).firstChild) ||
+        (startId + 7 === targetId &&
+          !document.querySelector(`[square-id="${startId + 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 5}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId + 6}"]`).firstChild) ||
+        startId - 1 === targetId ||
+        (startId - 2 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild) ||
+        (startId - 3 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild) ||
+        (startId - 4 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild) ||
+        (startId - 5 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild) ||
+        (startId - 6 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 5}"]`).firstChild) ||
+        (startId - 7 === targetId &&
+          !document.querySelector(`[square-id="${startId - 1}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 2}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 3}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 4}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 5}"]`).firstChild &&
+          !document.querySelector(`[square-id="${startId - 6}"]`).firstChild)
+      ) {
+        return true
+      }
+      break
+
+    case 'king':
+      if (
+        startId + 1 === targetId ||
+        startId - 1 === targetId ||
+        startId + width === targetId ||
+        startId + width + 1 === targetId ||
+        startId + width - 1 === targetId ||
+        startId - width === targetId ||
+        startId - width + 1 === targetId ||
+        startId - width - 1 === targetId
+      ) {
+        return true
+      }
+      break
+    default:
+      break
+  }
+  function changePlayer() {
+    if (playerTurn === 'black') {
+      reverseIds()
+      playerTurn = 'white'
+      playerDetails.textContent = 'white'
+    } else {
+      revertIds()
+      playerTurn = 'black'
+      playerDetails.textContent = 'black'
+    }
+  }
+
+  function reverseIds() {
+    const allSquares = document.querySelectorAll('#gameboard .square')
+    allSquares.forEach((square, i) => {
+      square.setAttribute('square-id', width * width - 1 - i)
+    })
+  }
+
+  function revertIds() {
+    const allSquares = document.querySelectorAll('#gameboard .square')
+    allSquares.forEach((square, i) => {
+      square.setAttribute('square-id', i)
+    })
+  }
+
+  function checkForWin() {
+    const kings = Array.from(document.querySelectorAll('#king'))
+
+    if (!kings.some((king) => king.firstChild.classList.contains('white'))) {
+      infoDisplay.innerHTML = 'Black Player Wins!'
+      const allSquares = document.querySelectorAll('.square')
+      allSquares.forEach((square) =>
+        square.firstChild?.setAttribute('draggable', false)
+      )
+    }
+    if (!kings.some((king) => king.firstChild.classList.contains('black'))) {
+      infoDisplay.innerHTML = 'White Player Wins!'
+      const allSquares = document.querySelectorAll('.square')
+      allSquares.forEach((square) =>
+        square.firstChild?.setAttribute('draggable', false)
+      )
+    }
+  }
 }

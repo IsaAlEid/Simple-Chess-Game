@@ -58,5 +58,5 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
 - Isa M. Al-Eid
 
 ### Disclaimer 
-```
+
 - The Chess node has been included, but it will not be implemented into the code. It is only there for future reference, and improvements on the game.
