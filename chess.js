@@ -111,9 +111,9 @@ createBoard()
 const allSquares = document.querySelectorAll('#gameboard .square')
 
 allSquares.forEach((square) => {
-  square.addEventListener('dragstart', dragStart)
-  square.addEventListener('dragover', dragOver)
-  square.addEventListener('drop', dragDrop)
+  square.addEventListener('dragstart', dragstart)
+  square.addEventListener('dragover', dragover)
+  square.addEventListener('drop', dragdrop)
 })
 
 let startPositionID
