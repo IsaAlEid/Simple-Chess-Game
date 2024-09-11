@@ -43,7 +43,7 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
  ### Image Header
 
 
-- Making the GameBoar
+- Making the GameBoard
 
 ![Initial code](https://i.imgur.com/khij4SX.png)
 

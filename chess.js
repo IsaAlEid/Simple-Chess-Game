@@ -122,7 +122,7 @@ allSquares.forEach((square) => {
 })
 
 let startPositionId
-let draggedPiece
+let draggedPiece = '.piece'
 
 function dragstart(e) {
   startPositionId = e.target.parentNode.getAttribute('square-id')
@@ -135,6 +135,8 @@ function dragover(e) {
 
 function dragDrop(e) {
   e.stopPropagation()
+  // console.log(e)
+  // console.log(draggedPiece)
   const correctTurn = draggedPiece.firstChild.classList.contains(playerTurn)
   const taken = e.target.classList.contains('piece')
   const valid = checkIfValidMove(e.target)
