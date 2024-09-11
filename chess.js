@@ -130,16 +130,16 @@ function dragOver(e) {
 
 function dragDrop(e) {
   e.stopPropagation()
-  // console.log('playerTurn', playerTurn);
-  // console.log(e.target);
+
   const correctTurn = draggedPiece.firstChild.classList.contains(playerTurn)
   const taken = e.target.classList.contains('piece')
   const opponentPiece = playerTurn === 'white' ? 'black' : 'white'
-  // console.log('opponentPiece', opponentPiece);
+
   const takenByOpponent = e.target.firstChild?.classList.contains(opponentPiece)
 
   if (correctTurn) {
     const valid = checkIfValidMove(e.target)
+
     if (takenByOpponent && valid) {
       e.target.parentNode.appendChild(draggedPiece)
       e.target.remove()
@@ -155,34 +155,31 @@ function dragDrop(e) {
   }
 }
 
-e.stopPropagation()
-// console.log('playerTurn', playerTurn)
-// console.log(e.target)
-const correctTurn = draggedPiece.firstChild.classList.contains(playerTurn)
-const taken = e.target.classList.contains('piece')
-const valid = checkIfValidMove(e.target)
-const opponentPiece = playerTurn === 'white' ? 'black' : 'white'
-// console.log('opponentPiece', opponentPiece)
-const takenByOpponent = e.target.firstChild.classList.contains(opponentPiece)
-
-if (correctTurn)
-  if (takenByOpponent && valid) {
-    e.target.parentNode.appendChild(draggedPiece)
-    e.target.remove()
-    changePlayer()
-  }
 if (taken && !takenByOpponent) {
-  infoDisplay.textContent = 'Invalid move'
+  err.textContent = 'Invalid move'
   setTimeout(() => (infoDisplay.textContent = ''), 3000)
 }
+// if (correctTurn)
+if (takenByOpponent && valid) {
+  e.target.parentNode.appendChild(draggedPiece)
+  e.target.remove()
+  checkForWin()
+  changePlayer()
+}
+
 if (valid) {
   e.target.appendChild(draggedPiece)
+  checkForWin()
   changePlayer()
 }
 function checkIfValid(target) {
-  const targetId = number()(target.parentNode.getAttribute('square-id'))
-  console.log(targetId)
+  const targetId =
+    number(target.parentNode.getAttribute('square-id')) ||
+    number(target.parentNode.getAttribute('square-id'))
+  const piece = draggedPiece.id
+  console.log(startPositionId, targetId, pieceId)
 }
+
 function changePlayer() {
   if (playerTurn === 'white') {
     reverseIds()
@@ -202,9 +199,7 @@ function reverseIds() {
 function revertIds() {
   allSquares.forEach((square, index) => square.setAttribute('square-id', index))
 }
-// document.getElementById('reset-btn').addEventListener('click', function () {
-//   location.reload()
-// })
+
 function checkIfValidMove() {
   const targetId =
     number()(target.getAttribute('square-id')) ||
