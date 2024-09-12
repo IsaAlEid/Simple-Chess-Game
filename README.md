@@ -51,7 +51,7 @@ It'll be done using everything taught so far involving HTML, CSS, and JavaScript
 
 ![Finished Board](https://i.imgur.com/l1q8xp8.png)
 
-![Drag and drop] https://i.imgur.com/YzScCDB.png
+![Drag and drop](https://i.imgur.com/YzScCDB.png)
  
 ---
 
