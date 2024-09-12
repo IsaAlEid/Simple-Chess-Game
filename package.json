@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "chess": "^1.2.2",
+    "global": "^4.4.0",
+    "surge": "^0.24.6",
     "vanilla.js": "^0.2.11"
   }
 }

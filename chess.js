@@ -212,7 +212,7 @@ function dragDrop(e) {
 
   if (correctTurn) {
     if (takenByOpponent && valid) {
-      e.target.appendChild(draggedPiece)
+      e.target.append(draggedPiece)
       e.target.remove()
       checkForWin()
       changePlayer()
