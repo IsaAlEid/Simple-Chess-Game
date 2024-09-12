@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "chess": "^1.2.2"
+    "chess": "^1.2.2",
+    "vanilla.js": "^0.2.11"
   }
 }

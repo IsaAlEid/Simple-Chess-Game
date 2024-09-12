@@ -14,7 +14,7 @@ body {
   background: url(images/chess.jpg);
   background-size: fill;
 }
-#gameboard {
+#gameBoard {
   width: 320px;
   height: 320px;
   display: flex;
@@ -45,10 +45,7 @@ p {
 .square {
   width: 40px;
   height: 40px;
-  border: 1px solid black;
   display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
 }
 
