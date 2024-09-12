@@ -74,10 +74,11 @@ path {
   z-index: -10;
 }
 
-h1 {
+button {
   color: white;
   font-size: 2rem;
   font-weight: bold;
+  font-color: white;
 }
 p {
   color: white;
